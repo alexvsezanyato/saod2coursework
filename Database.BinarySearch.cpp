@@ -1,3 +1,4 @@
+#include "All.hpp"
 #include "Database.hpp"
 #include <cstring>
 

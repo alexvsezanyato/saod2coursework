@@ -1,3 +1,4 @@
+#include "All.hpp"
 #include <vector>
 #include <string>
 #include <cctype>

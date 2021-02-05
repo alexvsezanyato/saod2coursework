@@ -1,3 +1,4 @@
+#include "All.hpp"
 #include "Tree.hpp"
 #include "DataStructs.hpp"
 
