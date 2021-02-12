@@ -6,5 +6,7 @@ old/
 *.vcxproj
 *.vcxproj*
 *.swp
-utf-8
 utf-8/*
+bin/*
+src/*
+obj/*

@@ -30,20 +30,20 @@ struct Queue {
 public:
 	using Size = unsigned short;
 	using Type = Record;
-	using Node = Node<Type>;
+	using Tnode = Node<Type>;
 	void pop();
 	void push(Type*);
 	Size size();
 
 	Type* front();
 	Type* back();
-	Node* data();
+	Tnode* data();
 	
 	Queue();
 	~Queue();
 
 private:
-	Node* first{};
-	Node* last{};
+	Tnode* first{};
+	Tnode* last{};
 	Size psize = 0;
 };

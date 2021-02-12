@@ -51,13 +51,13 @@ void Stree::drop() {
 	return;
 }
 
-Stree::Node* Stree::find(Stree::Sindex key) {
-	Stree::Node* node = nullptr;
+Stree::Tnode* Stree::find(Stree::Sindex key) {
+	Stree::Tnode* node = nullptr;
 	Vertex* vertex = root;
 
 	for (auto vertex = root; vertex;) {
 		if (*vertex->data == key) {
-			Stree::Node* helper = new Stree::Node;
+			Stree::Tnode* helper = new Stree::Node;
 			helper->data = vertex->data;
 			helper->next = node;
 			node = helper;

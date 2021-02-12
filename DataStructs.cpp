@@ -49,22 +49,22 @@ Queue::Size Queue::size() {
 }
 
 Queue::Type* Queue::front() {
-	Node* first = this->first;
+	Tnode* first = this->first;
 	return first->data;
 }
 
 Queue::Type* Queue::back() {
-	Node* last = this->last;
+	Tnode* last = this->last;
 	return last->data;
 }
 
-Queue::Node* Queue::data() {
+Queue::Tnode* Queue::data() {
 	auto root = this->first;
 	return root;
 }
 
 void Queue::push(Type* record) {
-	Node* node = new Node;
+	Tnode* node = new Tnode;
 	node->data = record;
 	node->next = first;
 	first = node;
@@ -74,7 +74,7 @@ void Queue::push(Type* record) {
 
 void Queue::pop() {
 	if (!size()) return;
-	Node* helper = this->first;
+	Tnode* helper = this->first;
 	this->first = helper->next;
 	delete helper;
 	psize--;

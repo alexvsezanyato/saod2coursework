@@ -2,18 +2,18 @@
 #include <cstdlib>
 #include <iostream>
 #include "DataStructs.hpp"
-#include "Stree.hpp"
+// #include "Stree.hpp"
 #include <vector>
 #include <queue>
 
 
 class Database {
 public:
-	using Queue = Queue;
-	using Records = std::vector<Record*>;
+	using Tqueue = Queue;
+	using Trecord = Record;
+	using Records = std::vector<Trecord*>;
 	using Size = unsigned short;
 	using Id = unsigned short;
-	using Record = Record;
 	// sort
 	class QuickSort;
 	using Sort = QuickSort;
@@ -22,11 +22,11 @@ public:
 	using SearchKey = char*;
 	class BinarySearch;
 	using Search = BinarySearch;
-	using Tree = Stree;
+	// using Tree = Stree;
 
 	struct SearchSets {
 		SearchKey searchKey;
-		Queue* outputTo;
+		Tqueue* outputTo;
 	};
 
 private:
@@ -36,7 +36,7 @@ private:
 	void drop();
 
 public:
-	Tree* makeTree(Queue*);
+	// Tree* makeTree(Tqueue*);
 	bool read(char*);
 	void sort();
 	void search(SearchSets);
@@ -52,11 +52,11 @@ public:
 	using Key = unsigned int;
 	static void sort(Records* data);
 	Records* data = nullptr;
-	Key getKey(Record*);
+	Key getKey(Trecord*);
 
 private:
 	QuickSort(Records* data);
-	void sort(Record*[], Size);
+	void sort(Trecord*[], Size);
 };
 
 class Database::BinarySearch {
@@ -65,15 +65,15 @@ public:
 		SearchKey what;
 		Record** searchIn{};
 		Size withSize = 0;
-		Queue* outputTo{};
+		Tqueue* outputTo{};
 	};
 
 private:
 	SearchKey searchKey;
 	Record** searchIn{};
 	Size size = 0;
-	Queue* outputTo{};
-	void search(Record** root, Size size);
+	Tqueue* outputTo{};
+	void search(Trecord** root, Size size);
 
 public:
 	BinarySearch(Sets);

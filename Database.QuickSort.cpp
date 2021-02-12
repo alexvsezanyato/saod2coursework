@@ -15,7 +15,7 @@ void Database::QuickSort::sort(Records* data) {
 	return;
 }
 
-Key Database::QuickSort::getKey(Record* record) {
+Key Database::QuickSort::getKey(Trecord* record) {
 	if (!record) exit(-1);
 	Key key = 0;
 
@@ -44,7 +44,7 @@ Key Database::QuickSort::getKey(Record* record) {
 	return key;
 }
 
-void Database::QuickSort::sort(Record* data[], Size size) {
+void Database::QuickSort::sort(Trecord* data[], Size size) {
 	int i = 0; // first id
 	int j = size - 1; // last id
 	Key pivot = getKey(data[size / 2]);

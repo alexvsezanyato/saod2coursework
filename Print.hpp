@@ -3,12 +3,7 @@
 
 namespace Printer {
 	using Count = short unsigned;
-	void printRecord(Record*);
-	void printBase(const List*, const Count = 20);
+	using Data = Record;
+	void printRecord(Data*);
+	void printBase(const List<Data>*, const Count = 20);
 }
-
-#include "Fixes.hpp"
-void print_stak(Queue*);
-void LorR(Vertex*&, Vertex*&);
-void LorL(Vertex*&, Vertex*&);
-void print_Btree(Vertex*&);

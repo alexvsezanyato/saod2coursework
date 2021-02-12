@@ -6,7 +6,7 @@ public:
 	using Size = unsigned short;
 	using Data = Record;
 	using Sindex = short;
-	using Node = Node<Data>;
+	using Tnode = Node<Data>;
 
 	struct Vertex {
 		Data* data{0};
@@ -16,7 +16,7 @@ public:
 
 	void insert(Data*);
 	void drop();
-	Node* find(Sindex);
+	Tnode* find(Sindex);
 
 private:
 	void drop(Vertex*);
