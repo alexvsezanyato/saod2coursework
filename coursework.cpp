@@ -7,19 +7,21 @@
 
 
 int main() {
+	std::wcout.imbue(std::locale());
+	std::wcin.imbue(std::locale());
 	Database database;
-	char baseName[] = "base.dat";
-	database.read(baseName);
+	char basename[] = "base.dat";
+	database.read(basename);
 	App app;
 	app.set(&database);
 	Database* sorted = nullptr;
-	// Database::Tree* root{0};
+	// database::tree* root{0};
 
 	while (true) {
 		app.clearScreen();
 		app.printMenu();
-		std::cout << std::endl;
-		std::cout << "Your choise is: ";
+		std::wcout << std::endl;
+		std::wcout << "your choise is: ";
 		std::string answer;
 		std::getline(std::cin, answer);
 		char request;

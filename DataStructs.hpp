@@ -1,10 +1,11 @@
 #pragma once
 
 struct Record {
-	char name[30];
+	using Char = char;
+	Char name[30];
 	short department;
-	char position[22];
-	char birth[10];
+	Char position[22];
+	Char birth[10];
 
 	bool operator==(const Record&);
 	bool operator!=(const Record&);

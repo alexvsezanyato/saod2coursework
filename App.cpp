@@ -14,7 +14,7 @@ void App::clearScreen() {
 }
 
 void App::printMenu() {
-	std::cout
+	std::wcout
 		<< "{1}. Show records. \n"
 		<< "{2}. Show sorted records. Key: birthdate. \n"
 		<< "{3}. Encode & show encoding stats. \n"
@@ -33,19 +33,19 @@ char* App::echo(char* data) {
 }
 
 void App::print(Id id, Record* record) {
-	std::cout
+	std::wcout
 		<< std::setw(4)
-		<< std::setfill('0')
+		<< std::setfill(L'0')
 		<< id
 		<< ". ";
-	std::cout << echo(record->name) << " - ";
-	std::cout << echo(record->position) << " - ";
-	std::cout
+	std::wcout << record->name << " - ";
+	std::wcout << record->position << " - ";
+	std::wcout
 		<< std::setw(3)
-		<< std::setfill('0')
+		<< std::setfill(L'0')
 		<< record->department
 		<< " - ";
-	std::cout << echo(record->birth) << '\n';
+	std::wcout << record->birth << '\n';
 }
 
 bool App::printDatabase(Id from, Id to) {
@@ -77,7 +77,7 @@ void App::printDatabase() {
 		bool result = printDatabase(id, id + step);
 		if (!result) return;
 
-		std::cout
+		std::wcout
 			<< '\n'
 			<< "{i} <id> - from <id: (0, max)>. \n"
 			<< "{s} <steps> - after <steps: (0, max)> steps. \n"
@@ -161,20 +161,20 @@ void App::print(Queue* queue) {
 			node = node->next;
 			id++;
 		}
-		std::cout << '\n';
+		std::wcout << '\n';
 
-		if (node) std::cout
+		if (node) std::wcout
 			<< "{n} - next ones. \n"
 			<< "{a} - show all. \n"
 			<< "{b} - go back. \n";
-		else std::cout
+		else std::wcout
 			<< "{any} - go back. \n";
-		std::cout 
+		std::wcout 
 			<< std::endl
 			<< "Your choise: ";
 		std::string answer;
 		std::getline(std::cin, answer);
-		std::cout << '\n';
+		std::wcout << '\n';
 		char request;
 		if (answer.size()) request = answer.at(0);
 		else request = 'd';
