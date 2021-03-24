@@ -6,46 +6,142 @@
 #include "Database.hpp"
 #include <string>
 #include <iomanip>
+#include <cstring>
+#include <cctype>
+#include <iconv.h>
 
 
 void App::clearScreen() {
-	// system("cls");
+	system("clear");
+	return;
+}
+
+void App::print(Btree<App::Record*>* tree) {
+	clearScreen();
+	tree->print();
+	std::cout
+		<< '\n'
+		<< "{*} - (any key) go back. \n"
+		<< "{b} - go back. \n"
+		<< std::endl
+		<< "Your choise: ";
+	std::string answer;
+	std::getline(std::cin, answer);
+	char request;
+	if (answer.size()) request = answer.at(0);
+	else request = 'd';
+
+	switch (request) {
+	case 'b':
+		// .. do nothing
+		break;
+
+	case 'd': default:
+		// .. do nothing
+		break;
+	}
+	return;
+}
+
+/*
+char* echo(char* source) {
+	using Conv = iconv_t;
+	using Len = size_t;
+	char from[] = "cp866";
+	char to[] = "utf-8";
+
+	Conv codes = iconv_open(to, from);
+	if (codes == (Conv) -1) perror ("iconv_open");
+
+	// \0 is required
+	Len ilength = std::strlen(source) + 1;
+	Len olength = ilength;
+	char* result = new char[olength + 1];
+	for (Len i = 0; i < olength; i++) result[i] = '\0';
+
+	char* stemp = source;
+	char* rtemp = result;
+
+	Len r = iconv(
+		codes,
+		&stemp,
+		&ilength - 1,
+		&rtemp,
+		&olength - 1
+	);
+
+	for (Len i = 0; i < ilength; i++)
+		source[i] = '\0';
+
+	short length = (ilength > olength)?
+		olength:
+		ilength;
+	for (Len i = 0; i < length - 1; i++) {
+		// olength must be bigger then ilength!
+		source[i] = result[i];
+	}
+
+	delete [] result;
+	iconv_close(codes);
+	return stemp;
+}
+*/
+
+void App::help() {
+	std::cout
+		<< "<appname> [-h, -e, -d] <filename?> <filename?>\n"
+		<< "<appname> <filename>: start with the <filename> database \n"
+		<< "-h: get help \n"
+		<< "-e <from> <to>: encode <from> to <to> \n"
+		<< "-d <from> <to>: decode <from> to <to> \n";
+	return;
+}
+
+void App::warning(const char text[]) {
+	std::cout
+		<< "Something went wrong. \n"
+		<< "Try -h for help. \n";
+
+	if (text) {
+		char* helper = new char[std::strlen(text) + 1];
+		helper = std::strcpy(helper, text);
+		helper[0] = std::toupper(helper[0]);
+		std::cout << helper << ".\n";
+		delete [] helper;
+	}
 	return;
 }
 
 void App::printMenu() {
-	std::wcout
+	std::cout
 		<< "{1}. Show records. \n"
 		<< "{2}. Show sorted records. Key: birthdate. \n"
-		<< "{3}. Encode & show encoding stats. \n"
 		<< std::endl
 		<< "{s} <birthyear, format: yy>. Search. \n"
-		<< "{t} <deparment: number>. Search using the Btree of the last search result \n"
+		<< "{t} <deparment: number>. Search by the latest result. \n"
+		<< "{c} <where to>. Encode the database. \n"
 		<< "{e}. Exit \n";
 	return;
 }
 
-char* App::echo(char* data) {
-	const short size = 30;
-	// char result[size];
-	// OemToCharBuff(data, result, size);
-	return data; // result;
+void App::print(Record* record) {
+	std::cout << record->name << " - ";
+	std::cout
+		<< std::setw(3)
+		<< std::setfill('0')
+		<< record->department
+		<< " - ";
+	std::cout << record->position << " - ";
+	std::cout << record->birth << '\n';
 }
 
 void App::print(Id id, Record* record) {
-	std::wcout
+	std::cout
 		<< std::setw(4)
-		<< std::setfill(L'0')
+		<< std::setfill('0')
 		<< id
 		<< ". ";
-	std::wcout << record->name << " - ";
-	std::wcout << record->position << " - ";
-	std::wcout
-		<< std::setw(3)
-		<< std::setfill(L'0')
-		<< record->department
-		<< " - ";
-	std::wcout << record->birth << '\n';
+	print(record);
 }
 
 bool App::printDatabase(Id from, Id to) {
@@ -66,7 +162,7 @@ bool App::printDatabase(Id from, Id to) {
 }
 
 void App::printDatabase() {
-	Id id = 0; 
+	Id id = 0;
 	Id step = 20;
 	Database::Size max = this->database->size() - 1;
 	if (!this->database) return;
@@ -77,7 +173,7 @@ void App::printDatabase() {
 		bool result = printDatabase(id, id + step);
 		if (!result) return;
 
-		std::wcout
+		std::cout
 			<< '\n'
 			<< "{i} <id> - from <id: (0, max)>. \n"
 			<< "{s} <steps> - after <steps: (0, max)> steps. \n"
@@ -89,6 +185,7 @@ void App::printDatabase() {
 			<< "{b} - go back. \n"
 			<< std::endl
 			<< "Your choise: ";
+
 		std::string answer;
 		std::getline(std::cin, answer);
 		char request;
@@ -133,8 +230,8 @@ void App::printDatabase() {
 			break;
 
 		case 'd': default:
-			// .. do nothing 
-			break; 
+			// .. do nothing
+			break;
 		}
 	}
 }
@@ -161,20 +258,20 @@ void App::print(Queue* queue) {
 			node = node->next;
 			id++;
 		}
-		std::wcout << '\n';
+		std::cout << '\n';
 
-		if (node) std::wcout
+		if (node) std::cout
 			<< "{n} - next ones. \n"
 			<< "{a} - show all. \n"
 			<< "{b} - go back. \n";
-		else std::wcout
+		else std::cout
 			<< "{any} - go back. \n";
-		std::wcout 
+		std::cout
 			<< std::endl
 			<< "Your choise: ";
 		std::string answer;
 		std::getline(std::cin, answer);
-		std::wcout << '\n';
+		std::cout << '\n';
 		char request;
 		if (answer.size()) request = answer.at(0);
 		else request = 'd';
@@ -193,7 +290,7 @@ void App::print(Queue* queue) {
 			break;
 
 		case 'd': default:
-			// .. do nothing 
+			// .. do nothing
 			break;
 		}
 	}

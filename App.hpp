@@ -1,5 +1,6 @@
 ﻿#pragma once
 #include "Database.hpp"
+#include "Btree-fixed.hpp"
 
 class App {
 private:
@@ -8,6 +9,7 @@ private:
 	using Record = Database::Trecord;
 	using Records = std::vector<Record*>;
 	using Queue = Database::Tqueue;
+
 	// deprecated,
 	// but is used in ohter methods:
 	Database* database = nullptr;
@@ -19,10 +21,10 @@ public:
 	void print(Queue*);
 	bool printDatabase(Id from, Id to);
 	void print(Id, Record*);
-
-	// for windows, 
-	// changes encoding:
-	char* echo(char*);
+	void print(Record*);
+	void print(Btree<Record*>*);
+	void help();
+	void warning(const char[] = nullptr);
 
 	void clearScreen();
 	void printMenu();

@@ -78,5 +78,4 @@ private:
 public:
 	BinarySearch(Sets);
 	void search();
-	// char* getKey(Record*);
 };

@@ -5,7 +5,6 @@
 #include <vector>
 #include "Database.hpp"
 
-
 using std::ios;
 using Id = Database::Id;
 using Size = Database::Size;
@@ -15,7 +14,7 @@ bool Database::read(char* fname) {
 	fin.open(fname, ios::in | ios::binary);
 
 	if (!fin) {
-		std::cout << "Cannot open file" << fname << std::endl;
+		std::cout << "Cannot open file \"" << fname << "\".\n";
 		fin.close();
 		return false;
 	}
@@ -81,7 +80,7 @@ void Database::search(SearchSets sets) {
 		}
 	);
 
-	// it uses a queue point 
+	// it uses a queue point
 	// and adds its data to the queue
 	searchBox.search();
 	return; // makeBtree(output);

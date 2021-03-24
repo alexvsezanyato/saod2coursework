@@ -1,21 +1,31 @@
 #pragma once
 #include <stdlib.h>
 #include <utility>
-#include <cstdio>
+#include <stdio.h>
 using namespace std;
 #define NEW_ROOT 2
 #define MODIFIED_NOT_ROOT 1
 #define NOT_MODIFIED 0
 
-// Constructor for b Btree.
-// t is the minimum degree of the Btree.
-// compare is the comparison function used for managing elements within the Btree.
+// Constructor for b tree.
+// t is the minimum degree of the tree.
+// compare is the comparison function used for managing elements within the tree.
 // printK is a function that prints keys.
 template <typename T>
 Btree<T>::Btree(unsigned t, bool (*compare)(T, T), void (*printK)(T)) {
 	minDegree = t;
 	lessThan = compare;
-	root = (BNode<T>*) malloc(sizeof(BNode<T>));
+	root = (Bnode<T>*) malloc(sizeof(Bnode<T>));
+	initializeNode(root);
+	root->leaf = true;
+	printKey = printK;
+}
+
+template <typename T>
+Btree<T>::Btree(bool (*compare)(T, T), void (*printK)(T)) {
+	minDegree = 2;
+	lessThan = compare;
+	root = (Bnode<T>*) malloc(sizeof(Bnode<T>));
 	initializeNode(root);
 	root->leaf = true;
 	printKey = printK;
@@ -28,14 +38,38 @@ Btree<T>::~Btree<T>() {
 	freeNode(root);
 }
 
+template <typename T>
+short Btree<T>::getSize() {
+   if (root) return 1;
+   else return 0;
+}
 
-// Inserts the key k into the Btree.
+template <typename T>
+void Btree<T>::make(Queue *queue) {
+    Btree<T>::makeFrom(queue, this);
+    return;
+}
+
+template <typename T>
+void Btree<T>::makeFrom(Queue *queue, Btree<T> *btree) {
+    if (!queue) return;
+    auto node = queue->data();
+
+    while (true) {
+        if (!node) break;
+        btree->insert(node->data);
+        node = node->next;
+    }
+    return;
+}
+
+// Inserts the key k into the tree.
 template <typename T>
 void Btree<T>::insert(T k) {
 
 	// Grow upwards if the root is full.
 	if (root->size == 2 * minDegree - 1) {
-		BNode<T> *newRoot = (BNode<T>*) malloc(sizeof(BNode<T>));
+		Bnode<T> *newRoot = (Bnode<T>*) malloc(sizeof(Bnode<T>));
 		initializeNode(newRoot);
 		newRoot->leaf = false;
 		newRoot->child[0] = root;
@@ -43,8 +77,8 @@ void Btree<T>::insert(T k) {
 		splitChild(newRoot, 0);
 	}
 
-	// Work down the Btree.
-	BNode<T> *curr = root;
+	// Work down the tree.
+	Bnode<T> *curr = root;
 	while (!curr->leaf) {
 
 		// Find the proper child to go to.
@@ -68,11 +102,11 @@ void Btree<T>::insert(T k) {
 }
 
 
-// Removes k from the Btree. Returns the removed key.
-// Throws a Btree_EXCEPTION if key is not found.
+// Removes k from the tree. Returns the removed key.
+// Throws a BTREE_EXCEPTION if key is not found.
 template <typename T>
 T Btree<T>::remove(T k) {
-	BNode<T> *curr = root;
+	Bnode<T> *curr = root;
 	while (true) {
 		unsigned i = findIndex(curr, k);
 
@@ -87,8 +121,8 @@ T Btree<T>::remove(T k) {
 
 			// Otherwise replace with predecessor/successor or merge children.
 			else {
-				BNode<T> *leftKid = curr->child[i];
-				BNode<T> *rightKid = curr->child[i + 1];
+				Bnode<T> *leftKid = curr->child[i];
+				Bnode<T> *rightKid = curr->child[i + 1];
 
 				// Replace with predecessor.
 				if (leftKid->size >= minDegree) {
@@ -108,7 +142,7 @@ T Btree<T>::remove(T k) {
 					curr->key[i] = nodeDelete(rightKid, 0);
 				}
 
-				// Merge children and move down the Btree.
+				// Merge children and move down the tree.
 				else {
 					mergeChildren(curr, i);
 					curr = leftKid;
@@ -118,15 +152,15 @@ T Btree<T>::remove(T k) {
 			return toReturn;
 		}
 
-		// If the item has not been found, move down the Btree.
+		// If the item has not been found, move down the tree.
 		else {
 
 			// If at a leaf, then the item isn't present.
 			if (curr->leaf) {
-				throw (Btree_EXCEPTION) REMOVE_KEY_NOT_FOUND;
+				throw (BTREE_EXCEPTION) REMOVE_KEY_NOT_FOUND;
 			}
 
-			// Adjust curr and move down the Btree.
+			// Adjust curr and move down the tree.
 			char result = fixChildSize(curr, i);
 			if (result == NEW_ROOT) {
 				curr = root;
@@ -139,16 +173,15 @@ T Btree<T>::remove(T k) {
 }
 
 
-// Function to find a key in the Btree.
+// Function to find a key in the tree.
 // returnValue.first is the node the item is in.
 // returnValue.second is the correct index in that node's key array
 template <typename T>
-pair<BNode<T>*, unsigned> Btree<T>::search(T k) {
-
+pair<Bnode<T>*, unsigned> Btree<T>::search(T k) {
 	// Start at root.
-	BNode<T> *x = root;
+	Bnode<T> *x = root;
 
-	// Work down the Btree.
+	// Work down the tree.
 	while (true) {
 
 		// Find the proper index in the current node's array.
@@ -156,12 +189,12 @@ pair<BNode<T>*, unsigned> Btree<T>::search(T k) {
 
 		// Found it!
 		if (i < x->size && !(lessThan(k, x->key[i]) || lessThan(x->key[i], k))) {
-			return pair<BNode<T>*, unsigned>(x, i);
+			return pair<Bnode<T>*, unsigned>(x, i);
 		}
 
-		// Hit the bottom of the Btree.
+		// Hit the bottom of the tree.
 		else if (x->leaf) {
-			return pair<BNode<T>*, unsigned>(NULL, 0);
+			return pair<Bnode<T>*, unsigned>(NULL, 0);
 		}
 
 		// Keep going.
@@ -172,45 +205,44 @@ pair<BNode<T>*, unsigned> Btree<T>::search(T k) {
 }
 
 
-// Function to find a key in the Btree.
+// Function to find a key in the tree.
 // Returns the key.
 // If the item was not found an exception is thrown.
 template <typename T>
 T Btree<T>::searchKey(T k) {
-	pair<BNode<T>*, unsigned> node = search(k);
+	pair<Bnode<T>*, unsigned> node = search(k);
 	if (node.first == NULL) {
-		throw (Btree_EXCEPTION) SEARCH_KEY_NOT_FOUND;
+		throw (BTREE_EXCEPTION) SEARCH_KEY_NOT_FOUND;
 	}
 	return node.first->key[node.second];
 }
 
 
-// Function for printing a Btree.
+// Function for printing a tree.
 template <typename T>
 void Btree<T>::print() {
 	if (printKey != NULL && root != NULL) {
-		printf("\n");
 		printNode(root, 0);
 		printf("\n");
 	}
 }
 
 
-// Initialize a b Btree node.
+// Initialize a b tree node.
 // x is a pointer to the node
-// t is the minimum degree of the Btree.
+// t is the minimum degree of the tree.
 template <typename T>
-void Btree<T>::initializeNode(BNode<T> *x) {
+void Btree<T>::initializeNode(Bnode<T> *x) {
 	x->size = 0;
 	x->key = (T*) malloc((2 * minDegree - 1) * sizeof(T));
-	x->child = (BNode<T>**) malloc(2 * minDegree * sizeof(BNode<T>*));
+	x->child = (Bnode<T>**) malloc(2 * minDegree * sizeof(Bnode<T>*));
 }
 
 
-// Recursively deletes the suBtree rooted at x.
+// Recursively deletes the subtree rooted at x.
 // Does the dirty work for the destructor.
 template <typename T>
-void Btree<T>::freeNode(BNode<T> *x) {
+void Btree<T>::freeNode(Bnode<T> *x) {
 	if (!x->leaf) {
 		for (unsigned i = 0; i <= x->size; i++) {
 			freeNode(x->child[i]);
@@ -223,10 +255,10 @@ void Btree<T>::freeNode(BNode<T> *x) {
 
 
 // Finds the index of k in x->key.
-// If k is not present, returns the index of the suBtree
+// If k is not present, returns the index of the subtree
 // that could contain k in x->child.
 template <typename T>
-unsigned Btree<T>::findIndex(BNode<T> *x, T k) {
+unsigned Btree<T>::findIndex(Bnode<T> *x, T k) {
 	unsigned i = 0;
 	while (i < x->size && lessThan(x->key[i], k)) {
 		i++;
@@ -238,7 +270,7 @@ unsigned Btree<T>::findIndex(BNode<T> *x, T k) {
 // Inserts k into x.
 // Returns the index of k in x->key.
 template <typename T>
-unsigned Btree<T>::nodeInsert(BNode<T> *x, T k) {
+unsigned Btree<T>::nodeInsert(Bnode<T> *x, T k) {
 	int index;
 
 	// Make room for k.
@@ -259,7 +291,7 @@ unsigned Btree<T>::nodeInsert(BNode<T> *x, T k) {
 // Deletes the indexth element from x->key.
 // Returns deleted key.
 template <typename T>
-T Btree<T>::nodeDelete(BNode<T> *x, unsigned index) {
+T Btree<T>::nodeDelete(Bnode<T> *x, unsigned index) {
 
 	T toReturn = x->key[index];
 
@@ -277,11 +309,11 @@ T Btree<T>::nodeDelete(BNode<T> *x, unsigned index) {
 // x points to the parent of the node to splits.
 // i is the index in x's child array of the node to split.
 template <typename T>
-void Btree<T>::splitChild(BNode<T> *x, int i) {
+void Btree<T>::splitChild(Bnode<T> *x, int i) {
 
 	// z is the new node and y is the node to split.
-	BNode<T> *toSplit = x->child[i];
-	BNode<T>* newNode = (BNode<T>*) malloc(sizeof(BNode<T>));;
+	Bnode<T> *toSplit = x->child[i];
+	Bnode<T>* newNode = (Bnode<T>*) malloc(sizeof(Bnode<T>));;
 	initializeNode(newNode);
 	newNode->leaf = toSplit->leaf;
 	newNode->size = minDegree - 1;
@@ -305,10 +337,10 @@ void Btree<T>::splitChild(BNode<T> *x, int i) {
 // Merges the (i + 1)th child of parent with the ith child of parent.
 // Returns an indicator of whether the change affected the root.
 template <typename T>
-char Btree<T>::mergeChildren(BNode<T> *parent, unsigned i) {
+char Btree<T>::mergeChildren(Bnode<T> *parent, unsigned i) {
 
-	BNode<T> *leftKid = parent->child[i];
-	BNode<T> *rightKid = parent->child[i + 1];
+	Bnode<T> *leftKid = parent->child[i];
+	Bnode<T> *rightKid = parent->child[i + 1];
 
 	// Move item from parent to left child.
 	leftKid->key[leftKid->size] = nodeDelete(parent, i);
@@ -344,15 +376,15 @@ char Btree<T>::mergeChildren(BNode<T> *parent, unsigned i) {
 // If it doesn't, then things are changed to make sure it does.
 // Returns a code indicating what action was taken.
 template <typename T>
-char Btree<T>::fixChildSize(BNode<T> *parent, unsigned index) {
-	BNode<T> *kid = parent->child[index];
+char Btree<T>::fixChildSize(Bnode<T> *parent, unsigned index) {
+	Bnode<T> *kid = parent->child[index];
 
 	// If things need fixed.
 	if (kid->size < minDegree) {
 
 		// Borrow from left sibling if possible.
 		if (index != 0 && parent->child[index - 1]->size >= minDegree) {
-			BNode<T> *leftKid = parent->child[index - 1];
+			Bnode<T> *leftKid = parent->child[index - 1];
 
 			// When there are numerous equivalent keys,
 			// nodeInsert can insert into an index other than 0.
@@ -366,7 +398,7 @@ char Btree<T>::fixChildSize(BNode<T> *parent, unsigned index) {
 
 		// Borrow from right sibling if possible
 		else if (index != parent->size && parent->child[index + 1]->size >= minDegree) {
-			BNode<T> *rightKid = parent->child[index + 1];
+			Bnode<T> *rightKid = parent->child[index + 1];
 			// Move curr->key[i] into kid->key
 			nodeInsert(kid, parent->key[index]);
 			kid->child[kid->size] = rightKid->child[0];
@@ -389,30 +421,64 @@ char Btree<T>::fixChildSize(BNode<T> *parent, unsigned index) {
 	return NOT_MODIFIED;
 }
 
-
-// Recursize function for printing a Btree or suBtree.
-// node is the root of the suBtree to be printed.
-// tab is how far to indent the suBtree.
 template <typename T>
-void Btree<T>::printNode(BNode<T> *node, unsigned tab) {
+void Btree<T>::search(Btree::Key key) {
+	search(key, root);
+	std::cout << '\n';
 
-	// Indent
-	for (unsigned i = 0; i < tab; i++) {
-		printf("\t");
+	std::cout
+		<< "{any} - go back. \n"
+		<< std::endl
+		<< "Your choise: ";
+	std::string answer;
+	std::getline(std::cin, answer);
+	std::cout << '\n';
+	char request;
+	if (answer.size()) request = answer.at(0);
+	else request = 'd';
+
+	switch (request) {
+	case 'n':
+		break;
+
+	case 'a':
+		break;
+
+	case 'b':
+		break;
+
+	case 'd': default:
+		break;
+	}
+	return;
+}
+
+template <typename T>
+void Btree<T>::search(Btree::Key key, Bnode<T> *node) {
+	for (short i = 0, j = 0; i < node->size; i++) {
+		if (node->key[i]->department == key) {
+			printKey(node->key[i]);
+		}
 	}
 
-	// Print the current node.
-	for (unsigned i = 0; i < node->size; i++) {
-		printKey(node->key[i]);
-		printf(" ");
-	}
-	printf("\n");
-
-	// Print all child nodes.
 	if (!node->leaf) {
-		tab++;
-		for (unsigned i = 0; i <= node->size; i++) {
-			printNode(node->child[i], tab);
+		for (short i = 0; i <= node->size; i++) {
+			search(key, node->child[i]);
+		}
+	}
+}
+
+
+template <typename T>
+void Btree<T>::printNode(Bnode<T> *node, unsigned position) {
+	for (short i = 0, j = 0; i < node->size; i++) {
+		std::cout << position << '.' << j++ << ": ";
+		printKey(node->key[i]);
+	}
+
+	if (!node->leaf && ++position) {
+		for (short i = 0; i <= node->size; i++) {
+			printNode(node->child[i], position);
 		}
 	}
 }

@@ -1,11 +1,15 @@
 #pragma once
 
 struct Record {
-	using Char = char;
-	Char name[30];
+	static const short nlength = 30; // 48
+	static const short plength = 22; // ?
+	static const short blength = 10; // ?
+
+	char name[nlength];
+	// char department[2];
 	short department;
-	Char position[22];
-	Char birth[10];
+	char position[plength];
+	char birth[blength];
 
 	bool operator==(const Record&);
 	bool operator!=(const Record&);
@@ -39,7 +43,7 @@ public:
 	Type* front();
 	Type* back();
 	Tnode* data();
-	
+
 	Queue();
 	~Queue();
 

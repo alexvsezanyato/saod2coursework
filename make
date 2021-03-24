@@ -21,16 +21,20 @@ dirs['bin']=bin
 main=coursework
 declare -a sources=()
 sources+=($main)
-sources+=('Print')
+# sources+=('Print')
 sources+=('App')
 sources+=('Database')
 sources+=('Database.BinarySearch')
 sources+=('Database.QuickSort')
+# sources+=('Fano')
 # sources+=('Stree')
+# sources+=('Btree-fixed')
+sources+=('Shanon')
 sources+=('DataStructs')
+# sources+=('Tree')
 
 for i in "${dirs[@]}"; do
-	if [ ! -d $i ]; then 
+	if [ ! -d $i ]; then
 		mkdir $i
 	fi
 done
@@ -38,17 +42,17 @@ done
 # main object file
 # ${compiler} -c -std=${version}  "${main}.cpp"
 
-for i in "${sources[@]}"; do 
+for i in "${sources[@]}"; do
 	# object files
 	source="${i}.${exts[src]}"
 
-	if [ ! -f "${source}" ]; then 
+	if [ ! -f "${source}" ]; then
 		echo "The file \"${source}\" doesn't exist"
 		continue
 	fi
 
 	${compiler} -c -std=${version} "${source}" \
-		 -o "${dirs[obj]}/${i}.${exts[obj]}"
+		 -o "${dirs[obj]}/${i}.${exts[obj]}" || exit 1
 done
 
 # executable
@@ -58,7 +62,7 @@ for i in "${sources[@]}"; do
 	objects+=("${dirs[obj]}/${i}.${exts[obj]}")
 done
 
-${compiler} -std=${version} ${objects[@]} -o "${dirs[bin]}/${appName}"
+${compiler} -std=${version} ${objects[@]} -o "${dirs[bin]}/${appName}" || exit 1
 unset exts[@]
 unset dirs[@]
 unset sources[@]
