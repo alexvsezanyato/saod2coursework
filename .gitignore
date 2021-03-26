@@ -10,3 +10,5 @@ utf-8/*
 bin/*
 src/*
 obj/*
+*.dat.*
+*.dat

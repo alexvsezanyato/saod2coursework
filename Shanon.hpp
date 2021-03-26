@@ -13,5 +13,11 @@ public:
 private:
 	using Byte = unsigned char;
 	using Code = std::string;
-	Code next(Code);
+
+	struct Data {
+		float p = 0.f;
+		float b = 0.f;
+		short l = 0;
+		std::string code = "";
+	};
 };
