@@ -19,7 +19,7 @@ void Database::BinarySearch::search(Record** root, Size size) {
 	key[0] = root[middle]->birth[6];
 	key[1] = root[middle]->birth[7];
 	int result = std::strcmp(key, searchKey);
-	
+
 	// {strcmp(a, b) > 0} => {a > b}
 	if (size > 1) {
 		if (!result) {
@@ -36,7 +36,7 @@ void Database::BinarySearch::search(Record** root, Size size) {
 			outputTo->push(root[middle]);
 		}
 	}
-	
+
 	return;
 }
 
