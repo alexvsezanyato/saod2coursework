@@ -10,7 +10,6 @@
 #include <cctype>
 #include <iconv.h>
 
-
 void App::clearScreen() {
 	system("clear");
 	return;
@@ -18,6 +17,7 @@ void App::clearScreen() {
 
 void App::print(Btree<App::Record*>* tree) {
 	clearScreen();
+	std::cout << "Records (last request): \n" << std::endl;
 	tree->print();
 	std::cout
 		<< '\n'
@@ -114,12 +114,14 @@ void App::warning(const char text[]) {
 
 void App::printMenu() {
 	std::cout
+		<< "Menu: \n"
+		<< std::endl
 		<< "{1}. Show records. \n"
 		<< "{2}. Show sorted records. Key: birthdate. \n"
 		<< std::endl
-		<< "{s} <birthyear, format: yy>. Search. \n"
-		<< "{t} <deparment: number>. Search by the latest result. \n"
-		<< "{c} <where to>. Encode the database. \n"
+		<< "{s}. <birthyear, format: yy> Search. \n"
+		<< "{t}. <deparment: number> Search by the latest result. \n"
+		<< "{d}. Show the tree data. \n"
 		<< "{e}. Exit \n";
 	return;
 }
@@ -169,6 +171,7 @@ void App::printDatabase() {
 
 	while (true) {
 		App::clearScreen();
+		std::cout << "Records: \n" << std::endl;
 		if (!database) break;
 		bool result = printDatabase(id, id + step);
 		if (!result) return;
@@ -193,45 +196,56 @@ void App::printDatabase() {
 		else request = 'd';
 
 		switch (request) {
-		case 'p':
-			id -= (id - step > 0)? step : id;
-			break;
+			case 'p': {
+				id -= (id - step > 0)? step : id;
+				break;
+			}
 
-		case 'n':
-			id += step;
-			break;
+			case 'n': {
+				id += step;
+				if (id > max - 2) id = max - 2;
+				break;
+			}
 
-		case 'b':
-			return;
-			break;
+			case 'b': {
+				return;
+				break;
+			}
 
-		case 'f':
-			id = 0;
-			break;
+			case 'f': {
+				id = 0;
+				break;
+			}
 
-		case 'l':
-			id = database->size() - step - 1;
-			break;
+			case 'l': {
+				id = database->size() - step - 1;
+				break;
+			}
 
-		case 'i':
-			if (answer.size() <= 1) break;
-			if (!std::isdigit(answer.at(1))) break;
-			id = std::atoi(&answer[1]);
-			if (id > max) id = max;
-			if (id < 0) id = 0;
-			break;
+			case 'i': {
+				if (answer.size() <= 1) break;
+				if (!std::isdigit(answer.at(1))) break;
+				Id required = std::atoi(&answer[1]);
+				if (required > max) break;
+				if (required < 0) break;
+				if (required > max - 2) required = max - 2;
+				id = required;
+				break;
+			}
 
-		case 's':
-			if (answer.size() <= 1) break;
-			if (!std::isdigit(answer.at(1))) break;
-			id += step * std::atoi(&answer[1]);
-			if (id > max) id = max;
-			if (id < 0) id = 0;
-			break;
+			case 's': {
+				if (answer.size() <= 1) break;
+				if (!std::isdigit(answer.at(1))) break;
+				id += step * std::atoi(&answer[1]);
+				if (id > max - 2) id = max - 2;
+				if (id < 0) id = 0;
+				break;
+			}
 
-		case 'd': default:
-			// .. do nothing
-			break;
+			case 'd': default: {
+				// .. do nothing
+				break;
+			}
 		}
 	}
 }
@@ -252,6 +266,9 @@ void App::print(Queue* queue) {
 	Queue::Tnode *node = queue->data();
 
 	while (node) {
+		App::clearScreen();
+		std::cout << "Records: \n" << std::endl;
+
 		for (int i = 0; i < step; i++) {
 			if (!node) break;
 			print(id, node->data);
@@ -266,9 +283,11 @@ void App::print(Queue* queue) {
 			<< "{b} - go back. \n";
 		else std::cout
 			<< "{any} - go back. \n";
+
 		std::cout
 			<< std::endl
 			<< "Your choise: ";
+
 		std::string answer;
 		std::getline(std::cin, answer);
 		std::cout << '\n';

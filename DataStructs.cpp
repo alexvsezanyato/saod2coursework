@@ -83,6 +83,7 @@ void Queue::pop() {
 Queue::Queue() {
 	// the queue doesn't allow set first, last
 	// you can only push / pop your data
+    // super text
 	return;
 }
 

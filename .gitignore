@@ -11,3 +11,5 @@ src/*
 obj/*
 *.dat.*
 *.dat
+*#
+coursework

@@ -26,7 +26,7 @@ int main(int argc, char *argv[]) {
 			}
 
 			case 'e': {
-				if (argc < 3) app.warning("filename required");
+				if (argc < 3) app.warning("Filename required");
 				Shanon shanon;
 				shanon.encode(argv[2], argv[3]);
 				return 0;
@@ -127,12 +127,16 @@ int main(int argc, char *argv[]) {
 				);
 				app.print(&queue);
 				tree.make(&queue);
+				break;
+			}
+
+			case 'd': {
 				app.print(&tree);
 				break;
 			}
 
 			case 't': {
-				if (!tree.getSize()) break;
+				if (tree.empty()) break;
 				if (answer.size() != 4) break;
 				if (!std::isdigit(answer.at(1))) break;
 				if (!std::isdigit(answer.at(2))) break;
