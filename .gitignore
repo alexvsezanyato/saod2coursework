@@ -1,7 +1,6 @@
 x64/
 *.exe
 *.out
-old/
 *~
 *.vcxproj
 *.vcxproj*
